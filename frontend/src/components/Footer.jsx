@@ -162,7 +162,7 @@ export default function Footer() {
     e.preventDefault();
     setLoading(true);
     try {
-      await api.post("/newsletter", { email });
+      await api.post("/settings/subscribe", { email });
       toast.success("Welcome to the GymSword inner circle");
       setEmail("");
     } catch {

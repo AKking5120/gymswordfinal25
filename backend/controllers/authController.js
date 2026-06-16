@@ -61,7 +61,14 @@ const register = async (req, res) => {
     // Generate and store OTP in otp_verifications table
     const { otp, error: otpError } = await createOTP('register', email, newUser.id);
     if (!otpError) {
-      sendVerificationOTP(newUser, otp).catch(e => console.error('Verification email failed:', e.message));
+      if (process.env.NODE_ENV !== 'production') {
+        console.log(`[DEV] Registration OTP for ${email}: ${otp}`);
+      }
+      try {
+        await sendVerificationOTP(newUser, otp);
+      } catch (e) {
+        console.error('Verification email failed:', e.message);
+      }
     }
 
     // Handle referral reward
@@ -158,7 +165,14 @@ const resendOTP = async (req, res) => {
     const { otp, error: otpError } = await createOTP('register', normalizedEmail, user.id);
     if (otpError) return sendError(res, otpError, 429);
 
-    sendVerificationOTP(user, otp).catch(e => console.error('Resend OTP email failed:', e.message));
+    if (process.env.NODE_ENV !== 'production') {
+      console.log(`[DEV] Resend OTP for ${normalizedEmail}: ${otp}`);
+    }
+    try {
+      await sendVerificationOTP(user, otp);
+    } catch (e) {
+      console.error('Resend OTP email failed:', e.message);
+    }
 
     return sendSuccess(res, {}, 'OTP resent to your email');
   } catch (err) {
@@ -234,7 +248,14 @@ const forgotPassword = async (req, res) => {
 
     const { otp, error: otpError } = await createOTP('forgot_password', email, user.id);
     if (!otpError) {
-      sendForgotPasswordOTP(user, otp).catch(e => console.error('Forgot password email failed:', e.message));
+      if (process.env.NODE_ENV !== 'production') {
+        console.log(`[DEV] Forgot Password OTP for ${email}: ${otp}`);
+      }
+      try {
+        await sendForgotPasswordOTP(user, otp);
+      } catch (e) {
+        console.error('Forgot password email failed:', e.message);
+      }
     }
 
     return sendSuccess(res, {}, 'If an account exists, an OTP has been sent');
@@ -504,7 +525,17 @@ const sendLoginOTP = async (req, res) => {
     const { otp, error: otpError } = await createOTP('login', email, user.id);
     if (otpError) return sendError(res, otpError, 429);
 
-    sendLoginOTPEmail(user, otp).catch(e => console.error('Login OTP email failed:', e.message));
+    // Log OTP in dev for debugging
+    if (process.env.NODE_ENV !== 'production') {
+      console.log(`[DEV] Login OTP for ${email}: ${otp}`);
+    }
+
+    try {
+      await sendLoginOTPEmail(user, otp);
+    } catch (e) {
+      console.error('Login OTP email failed:', e.message);
+      return sendError(res, 'Failed to send OTP email. Please try again.', 500);
+    }
 
     return sendSuccess(res, {}, 'OTP sent to your email');
   } catch (err) {

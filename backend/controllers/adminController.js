@@ -10,6 +10,30 @@ let siteSettings = {
   coming_soon:      process.env.COMING_SOON      === 'true',
   show_prices:      process.env.SHOW_PRICES      !== 'false',
   enable_purchases: process.env.ENABLE_PURCHASES !== 'false',
+  // Shipping
+  free_shipping_threshold: 999,
+  standard_shipping_fee: 49,
+  express_shipping_fee: 149,
+  // Payment
+  enable_cod: true,
+  razorpay_key_id: '',
+  razorpay_key_secret: '',
+  // SEO
+  default_meta_title: 'GymSword - Premium Gymwear',
+  default_meta_description: 'Premium gymwear engineered for performance. Shop the latest activewear collections.',
+  default_og_image: '',
+  // Tax
+  gst_percentage: 18,
+  // Social
+  instagram_url: 'https://instagram.com/gymsword',
+  facebook_url: 'https://facebook.com/gymsword',
+  youtube_url: 'https://youtube.com/@gymsword',
+  twitter_url: 'https://x.com/gymsword',
+  pinterest_url: 'https://pinterest.com/gymsword',
+  // Theme
+  logo_url: '',
+  primary_color: '#000000',
+  accent_color: '#ffffff',
 };
 
 const sendSuccess = (res, data, message = 'OK', statusCode = 200) =>
@@ -118,7 +142,13 @@ const getAdminSettings = (req, res) => {
 
 const updateAdminSettings = (req, res) => {
   const allowed = ['hero_headline', 'hero_subheadline', 'announcement_bar',
-                   'coming_soon', 'show_prices', 'enable_purchases'];
+                   'coming_soon', 'show_prices', 'enable_purchases',
+                   'free_shipping_threshold', 'standard_shipping_fee', 'express_shipping_fee',
+                   'enable_cod', 'razorpay_key_id', 'razorpay_key_secret',
+                   'default_meta_title', 'default_meta_description', 'default_og_image',
+                   'gst_percentage',
+                   'instagram_url', 'facebook_url', 'youtube_url', 'twitter_url', 'pinterest_url',
+                   'logo_url', 'primary_color', 'accent_color'];
   for (const key of allowed) {
     if (key in req.body) siteSettings[key] = req.body[key];
   }

@@ -38,6 +38,18 @@ import AdminCoupons from "@/pages/admin/AdminCoupons";
 import AdminAnalytics from "@/pages/admin/AdminAnalytics";
 import AdminSettings from "@/pages/admin/AdminSettings";
 import AdminContactMessages from "@/pages/admin/AdminContactMessages";
+import AdminCategories from "@/pages/admin/AdminCategories";
+import AdminReviews from "@/pages/admin/AdminReviews";
+import AdminBanners from "@/pages/admin/AdminBanners";
+import AdminLeads from "@/pages/admin/AdminLeads";
+import AdminEmailLogs from "@/pages/admin/AdminEmailLogs";
+import AdminBlog from "@/pages/admin/AdminBlog";
+import AdminFAQ from "@/pages/admin/AdminFAQ";
+import AdminReturns from "@/pages/admin/AdminReturns";
+import AdminFlashSales from "@/pages/admin/AdminFlashSales";
+import AdminNewsletter from "@/pages/admin/AdminNewsletter";
+import AdminExport from "@/pages/admin/AdminExport";
+import AdminStaff from "@/pages/admin/AdminStaff";
 import Contact from "@/pages/Contact";
 import About from "@/pages/About";
 import OurStory from "@/pages/OurStory";
@@ -154,10 +166,20 @@ function App() {
                   <Route path="customers" element={<AdminCustomers />} />
                   <Route path="coupons" element={<AdminCoupons />} />
                   <Route path="messages" element={<AdminContactMessages />} />
+                  <Route path="categories" element={<AdminCategories />} />
+                  <Route path="reviews" element={<AdminReviews />} />
+                  <Route path="banners" element={<AdminBanners />} />
+                  <Route path="leads" element={<AdminLeads />} />
+                  <Route path="email-logs" element={<AdminEmailLogs />} />
                   <Route path="analytics" element={<AdminAnalytics />} />
+                  <Route path="blog" element={<AdminBlog />} />
+                  <Route path="faqs" element={<AdminFAQ />} />
+                  <Route path="returns" element={<AdminReturns />} />
+                  <Route path="flash-sales" element={<AdminFlashSales />} />
+                  <Route path="newsletter" element={<AdminNewsletter />} />
+                  <Route path="export" element={<AdminExport />} />
+                  <Route path="staff" element={<AdminStaff />} />
                   <Route path="settings" element={<AdminSettings />} />
-
-                 
                 </Route>
               </Routes>
             </BrowserRouter>
