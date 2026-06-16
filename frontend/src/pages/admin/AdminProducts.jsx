@@ -209,7 +209,10 @@ export default function AdminProducts() {
 />
               <F label="Collection (new, sale, essentials)" value={editing.collection || ""} onChange={(v) => setEditing({ ...editing, collection: v })} />
               <F label="Colors (comma)" value={(editing.colors || []).join(", ")} onChange={(v) => setEditing({ ...editing, colors: v.split(",").map(s => s.trim()).filter(Boolean) })} className="sm:col-span-2" />
-              <F label="Sizes (comma-separated, e.g. S, M, L, XL)" value={Array.isArray(editing.sizes) ? editing.sizes.join(", ") : (editing.sizes || "")} onChange={(v) => setEditing({ ...editing, sizes: v.split(",").map(s => s.trim()).filter(Boolean) })} className="sm:col-span-2" />
+              <div className="sm:col-span-2">
+                <div className="text-overline text-white/50 mb-2">Sizes</div>
+                <SizeToggle value={editing.sizes || []} onChange={(v) => setEditing({ ...editing, sizes: v })} />
+              </div>
               <TextareaF label="Description" value={editing.description} onChange={(v) => setEditing({ ...editing, description: v })} className="sm:col-span-2" />
               <div className="sm:col-span-2">
                 <div className="text-overline text-white/50 mb-2">Images</div>
@@ -244,6 +247,29 @@ export default function AdminProducts() {
           </div>
         </div>
       )}
+    </div>
+  );
+}
+
+const COMMON_SIZES = ["XS", "S", "M", "L", "XL", "XXL", "3XL", "28", "30", "32", "34", "36", "38", "Free"];
+
+function SizeToggle({ value, onChange }) {
+  const toggle = (size) => {
+    const next = value.includes(size) ? value.filter(s => s !== size) : [...value, size];
+    onChange(next);
+  };
+  return (
+    <div className="flex flex-wrap gap-2">
+      {COMMON_SIZES.map(s => (
+        <button key={s} type="button" onClick={() => toggle(s)}
+          className={`px-4 py-2 text-sm border transition ${
+            value.includes(s)
+              ? "bg-white text-black border-white"
+              : "bg-transparent text-white/60 border-white/20 hover:border-white/40"
+          }`}>
+          {s}
+        </button>
+      ))}
     </div>
   );
 }
