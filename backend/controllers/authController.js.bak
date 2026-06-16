@@ -1,0 +1,237 @@
+const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
+const supabase = require('../config/db');
+const { sendSuccess, sendError, generateReferralCode } = require('../utils/helpers');
+const { creditWallet } = require('../services/walletService');
+const { createNotification } = require('../services/notificationService');
+
+const generateToken = (id) =>
+  jwt.sign({ id }, process.env.JWT_SECRET, { expiresIn: process.env.JWT_EXPIRES_IN || '7d' });
+
+// POST /api/auth/register
+const register = async (req, res) => {
+  try {
+    const { name, email, password, referred_by } = req.body;
+
+    if (!name || !email || !password)
+      return sendError(res, 'Name, email and password are required', 400);
+
+    const { data: existing } = await supabase
+      .from('users')
+      .select('id')
+      .eq('email', email)
+      .single();
+
+    if (existing) return sendError(res, 'Email already registered', 409);
+
+    const hashedPassword = await bcrypt.hash(password, 10);
+    const referralCode = generateReferralCode();
+
+    const { data: newUser, error } = await supabase
+      .from('users')
+      .insert({ name, email, password: hashedPassword, referral_code: referralCode, referred_by })
+      .select('id, name, email, role, wallet_coins, referral_code')
+      .single();
+
+    if (error) return sendError(res, error.message);
+
+    // Handle referral reward
+    if (referred_by) {
+      const { data: referrer } = await supabase
+        .from('users')
+        .select('id')
+        .eq('referral_code', referred_by)
+        .single();
+
+      if (referrer) {
+        await supabase.from('referrals').insert({
+          referrer_id: referrer.id,
+          referred_user_id: newUser.id,
+          referral_code: referred_by,
+          reward_coins: 25,
+          reward_given: false,
+        });
+      }
+    }
+
+    await createNotification(newUser.id, 'Welcome!', `Hi ${name}, welcome to our store!`);
+
+    const token = generateToken(newUser.id);
+    return sendSuccess(res, { data: { user: newUser, token } }, 'Registered successfully', 201);
+  } catch (err) {
+    return sendError(res, err.message);
+  }
+};
+
+// POST /api/auth/login
+const login = async (req, res) => {
+  try {
+    const { email, password } = req.body;
+    if (!email || !password) return sendError(res, 'Email and password required', 400);
+
+    const { data: user, error } = await supabase
+      .from('users')
+      .select('*')
+      .eq('email', email)
+      .single();
+
+    if (error || !user) return sendError(res, 'Invalid credentials', 401);
+
+    const isMatch = await bcrypt.compare(password, user.password);
+    if (!isMatch) return sendError(res, 'Invalid credentials', 401);
+
+    const { password: _, ...safeUser } = user;
+    const token = generateToken(user.id);
+
+    return sendSuccess(res, { data: { user: safeUser, token } }, 'Login successful');
+  } catch (err) {
+    return sendError(res, err.message);
+  }
+};
+
+// GET /api/auth/me
+const getMe = async (req, res) => {
+  try {
+    return sendSuccess(res, { data: req.user });
+  } catch (err) {
+    return sendError(res, err.message);
+  }
+};
+
+// PUT /api/auth/profile
+const updateProfile = async (req, res) => {
+  try {
+    const { name, password } = req.body;
+    const updates = {};
+
+    if (name) updates.name = name;
+    if (password) updates.password = await bcrypt.hash(password, 10);
+
+    const { data, error } = await supabase
+      .from('users')
+      .update(updates)
+      .eq('id', req.user.id)
+      .select('id, name, email, role, wallet_coins')
+      .single();
+
+    if (error) return sendError(res, error.message);
+    return sendSuccess(res, { data }, 'Profile updated');
+  } catch (err) {
+    return sendError(res, err.message);
+  }
+};
+
+// GET /api/auth/addresses
+const getAddresses = async (req, res) => {
+  try {
+    const { data, error } = await supabase
+      .from('addresses')
+      .select('*')
+      .eq('user_id', req.user.id);
+
+    if (error) return sendError(res, error.message);
+    return sendSuccess(res, { data });
+  } catch (err) {
+    return sendError(res, err.message);
+  }
+};
+
+// POST /api/auth/addresses
+const addAddress = async (req, res) => {
+  try {
+    const { full_name, mobile, address_line1, address_line2, city, state, pincode, country, is_default } = req.body;
+
+    if (is_default) {
+      await supabase.from('addresses').update({ is_default: false }).eq('user_id', req.user.id);
+    }
+
+    const { data, error } = await supabase
+      .from('addresses')
+      .insert({ user_id: req.user.id, full_name, mobile, address_line1, address_line2, city, state, pincode, country, is_default })
+      .select()
+      .single();
+
+    if (error) return sendError(res, error.message);
+    return sendSuccess(res, { data }, 'Address added', 201);
+  } catch (err) {
+    return sendError(res, err.message);
+  }
+};
+
+// PUT /api/auth/addresses/:id
+const updateAddress = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    if (req.body.is_default) {
+      await supabase.from('addresses').update({ is_default: false }).eq('user_id', req.user.id);
+    }
+
+    const { data, error } = await supabase
+      .from('addresses')
+      .update(req.body)
+      .eq('id', id)
+      .eq('user_id', req.user.id)
+      .select()
+      .single();
+
+    if (error) return sendError(res, error.message);
+    return sendSuccess(res, { data }, 'Address updated');
+  } catch (err) {
+    return sendError(res, err.message);
+  }
+};
+
+// DELETE /api/auth/addresses/:id
+const deleteAddress = async (req, res) => {
+  try {
+    const { error } = await supabase
+      .from('addresses')
+      .delete()
+      .eq('id', req.params.id)
+      .eq('user_id', req.user.id);
+
+    if (error) return sendError(res, error.message);
+    return sendSuccess(res, {}, 'Address deleted');
+  } catch (err) {
+    return sendError(res, err.message);
+  }
+};
+
+// GET /api/auth/notifications
+const getNotifications = async (req, res) => {
+  try {
+    const { data, error } = await supabase
+      .from('notifications')
+      .select('*')
+      .eq('user_id', req.user.id)
+      .order('created_at', { ascending: false });
+
+    if (error) return sendError(res, error.message);
+    return sendSuccess(res, { data });
+  } catch (err) {
+    return sendError(res, err.message);
+  }
+};
+
+// PUT /api/auth/notifications/:id/read
+const markNotificationRead = async (req, res) => {
+  try {
+    const { error } = await supabase
+      .from('notifications')
+      .update({ is_read: true })
+      .eq('id', req.params.id)
+      .eq('user_id', req.user.id);
+
+    if (error) return sendError(res, error.message);
+    return sendSuccess(res, {}, 'Marked as read');
+  } catch (err) {
+    return sendError(res, err.message);
+  }
+};
+
+module.exports = {
+  register, login, getMe, updateProfile,
+  getAddresses, addAddress, updateAddress, deleteAddress,
+  getNotifications, markNotificationRead,
+};
