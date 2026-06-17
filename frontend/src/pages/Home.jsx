@@ -7,12 +7,14 @@ import ProductCard from "@/components/ProductCard";
 import { HOME } from "@/constants/testIds";
 import HeroSlider from "@/components/HeroSlider";
 import TopCollections from "@/components/TopCollections";
+import { useSite } from "@/context/SiteContext";
 
 const LOOKBOOK_1 = "https://res.cloudinary.com/de6pxtiom/image/upload/v1781685743/gymsword/cinvnxk0qzr3uyj5arzp.png";
 const LOOKBOOK_2 = "https://res.cloudinary.com/de6pxtiom/image/upload/v1781685735/gymsword/akinjqm2t4a7yla2la8e.png";
 const ABOUT_BG = "https://images.pexels.com/photos/17211446/pexels-photo-17211446.jpeg";
 
 export default function Home() {
+  const { settings } = useSite();
   const [featured, setFeatured] = useState([]);
   const [newDrops, setNewDrops] = useState([]);
   const [bestSellers, setBestSellers] = useState([]);
@@ -73,8 +75,14 @@ export default function Home() {
       {/* SPLIT EDITORIAL */}
       <section className="grid lg:grid-cols-2 gap-0 bg-[#F5F5F7]">
         <div className="relative aspect-[4/5] lg:aspect-auto overflow-hidden">
-          <img src={LOOKBOOK_1} alt="Lookbook Women" className="w-full h-full object-cover" />
+          <img src={LOOKBOOK_1} alt="Lookbook Women" className={`w-full h-full object-cover transition-all duration-700 ${settings.coming_soon ? "scale-110 blur-[12px]" : ""}`} />
           <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+          {settings.coming_soon && (
+            <div className="absolute inset-0 flex flex-col items-center justify-center z-10">
+              <img src="/images/287914795.png" alt="" className="w-16 h-16 object-contain drop-shadow-lg" />
+              <div className="mt-3 text-[11px] text-white/70 tracking-[0.25em] uppercase drop-shadow-lg">Coming Soon</div>
+            </div>
+          )}
           <div className="absolute bottom-12 left-12 right-12 text-white">
             <div className="text-overline mb-2 text-white/70">For Her</div>
             <h3 className="font-display uppercase font-black text-3xl sm:text-4xl mb-6">Strength in Form</h3>
@@ -82,8 +90,14 @@ export default function Home() {
           </div>
         </div>
         <div className="relative aspect-[4/5] lg:aspect-auto overflow-hidden">
-          <img src={LOOKBOOK_2} alt="Lookbook Men" className="w-full h-full object-cover" />
+          <img src={LOOKBOOK_2} alt="Lookbook Men" className={`w-full h-full object-cover transition-all duration-700 ${settings.coming_soon ? "scale-110 blur-[12px]" : ""}`} />
           <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+          {settings.coming_soon && (
+            <div className="absolute inset-0 flex flex-col items-center justify-center z-10">
+              <img src="/images/287914795.png" alt="" className="w-16 h-16 object-contain drop-shadow-lg" />
+              <div className="mt-3 text-[11px] text-white/70 tracking-[0.25em] uppercase drop-shadow-lg">Coming Soon</div>
+            </div>
+          )}
           <div className="absolute bottom-12 left-12 right-12 text-white">
             <div className="text-overline mb-2 text-white/70">For Him</div>
             <h3 className="font-display uppercase font-black text-3xl sm:text-4xl mb-6">Built for Battle</h3>

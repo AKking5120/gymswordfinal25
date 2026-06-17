@@ -74,76 +74,50 @@ export default function ProductCard({ product }) {
 
             {comingSoon && (
               <div className="absolute inset-0 flex flex-col items-center justify-center">
-                <img src="/images/287914795.png" alt="" className="w-14 h-14 object-contain drop-shadow-lg" />
-                <div className="mt-2 text-[10px] text-white/70 tracking-[0.25em] uppercase drop-shadow-lg">Coming Soon</div>
+                <img src="/images/287914795.png" alt="" className="w-10 h-10 md:w-14 md:h-14 object-contain drop-shadow-lg" />
+                <div className="mt-1 md:mt-2 text-[8px] md:text-[10px] text-white/70 tracking-[0.2em] md:tracking-[0.25em] uppercase drop-shadow-lg">Coming Soon</div>
               </div>
             )}
 
-            <div className="absolute top-3 left-3 z-10 bg-white/80 backdrop-blur-sm text-black text-[9px] font-bold tracking-[1.5px] px-3 py-1.5 rounded-full uppercase">
+            <div className="absolute top-2 left-2 z-10 bg-white/80 backdrop-blur-sm text-black text-[8px] md:text-[9px] font-bold tracking-[1.5px] px-2 md:px-3 py-1 rounded-full uppercase">
               GymSword
             </div>
 
-            <button
-              onClick={handleWishlist}
-              className="absolute top-3 right-3 z-10 w-9 h-9 rounded-full bg-white/80 backdrop-blur-sm border border-gray-200 flex items-center justify-center hover:bg-white transition"
-              aria-label="Wishlist"
-              data-testid={`wishlist-toggle-${product.id}`}
-            >
-              <Heart size={15} className="text-black" fill={has(product.id) ? "#000" : "none"} />
-            </button>
-
-            <button
-              onClick={handle360}
-              className="absolute top-3 right-3 z-10 w-9 h-9 rounded-full bg-white/80 backdrop-blur-sm border border-gray-200 flex items-center justify-center hover:bg-white transition"
-              style={{ marginTop: "44px" }}
-              aria-label="360° View"
-            >
-              <RotateCw size={14} className="text-black" />
-            </button>
-
-            <button
-              onClick={handleTryOn}
-              className="absolute top-3 right-3 z-10 w-9 h-9 rounded-full bg-white/80 backdrop-blur-sm border border-gray-200 flex items-center justify-center hover:bg-white transition"
-              style={{ marginTop: "88px" }}
-              aria-label="Try Now"
-            >
-              <Sparkles size={14} className="text-black" />
-            </button>
-
-            {/* QUICK VIEW BUTTON — hover */}
-            <div className="absolute bottom-3 left-0 right-0 flex justify-center z-10 px-6 opacity-0 group-hover:opacity-100 translate-y-2 group-hover:translate-y-0 transition-all duration-300">
-              <button
-                onClick={handleQuickView}
-                className="flex items-center gap-2 bg-white/90 backdrop-blur-md text-black text-[10px] font-bold uppercase tracking-[2px] px-5 py-2.5 rounded-xl hover:bg-white shadow-lg transition-all duration-300"
-              >
-                <Eye size={13} />
-                Quick View
+            <div className="absolute top-2 right-2 z-10 flex flex-col gap-1">
+              <button onClick={handleWishlist} className="w-7 h-7 rounded-full bg-white/80 backdrop-blur-sm border border-gray-200 flex items-center justify-center hover:bg-white transition shrink-0" aria-label="Wishlist" data-testid={`wishlist-toggle-${product.id}`}>
+                <Heart size={11} className="text-black" fill={has(product.id) ? "#000" : "none"} />
+              </button>
+              <button onClick={handle360} className="w-7 h-7 rounded-full bg-white/80 backdrop-blur-sm border border-gray-200 flex items-center justify-center hover:bg-white transition shrink-0" aria-label="360° View">
+                <RotateCw size={10} className="text-black" />
+              </button>
+              <button onClick={handleTryOn} className="w-7 h-7 rounded-full bg-white/80 backdrop-blur-sm border border-gray-200 flex items-center justify-center hover:bg-white transition shrink-0" aria-label="Try Now">
+                <Sparkles size={10} className="text-black" />
               </button>
             </div>
           </div>
         </Link>
 
         {/* ── PRODUCT INFO ── */}
-        <div className="px-4 pb-5 pt-4">
+        <div className="px-3 md:px-4 pb-4 md:pb-5 pt-3 md:pt-4">
           <div className="flex items-start justify-between gap-2">
             <Link to={`/product/${product.id}`} className="flex-1 min-w-0">
-              <h3 className="text-[16px] font-bold text-black leading-snug">{product.name}</h3>
+              <h3 className="text-[13px] md:text-[16px] font-bold text-black leading-tight md:leading-snug">{product.name}</h3>
             </Link>
             {comingSoon && (
-              <span className="flex-shrink-0 bg-black text-white text-[8px] font-bold tracking-[1.5px] px-2.5 py-1 rounded-full uppercase whitespace-nowrap">
+              <span className="flex-shrink-0 bg-black text-white text-[7px] md:text-[8px] font-bold tracking-[1px] px-2 py-1 rounded-full uppercase whitespace-nowrap">
                 Coming Soon
               </span>
             )}
           </div>
 
           {product.short_description && (
-            <p className="text-[10px] uppercase tracking-[1.5px] text-gray-400 mt-1 leading-relaxed">
+            <p className="text-[9px] md:text-[10px] uppercase tracking-[1.5px] text-gray-400 mt-1 leading-relaxed">
               {product.short_description}
             </p>
           )}
 
           {sizes.length > 0 && (
-            <div className="flex items-center gap-2 mt-4">
+            <div className="flex items-center gap-1.5 md:gap-2 mt-3 md:mt-4">
               {sizes.slice(0, 6).map((s) => (
                 <button
                   key={s}
@@ -153,7 +127,7 @@ export default function ProductCard({ product }) {
                     setSelectedSize(s);
                     setQuickViewOpen(true);
                   }}
-                  className="w-[34px] h-[34px] rounded-full text-[11px] font-semibold flex items-center justify-center bg-white border-[1.5px] border-gray-200 text-gray-500 hover:border-black hover:text-black transition-all duration-200"
+                  className="w-[28px] h-[28px] md:w-[34px] md:h-[34px] rounded-full text-[9px] md:text-[11px] font-semibold flex items-center justify-center bg-white border-[1.5px] border-gray-200 text-gray-500 hover:border-black hover:text-black transition-all duration-200"
                 >
                   {s}
                 </button>
@@ -161,19 +135,19 @@ export default function ProductCard({ product }) {
             </div>
           )}
 
-          <div className="flex items-end justify-between mt-4">
+          <div className="flex items-end justify-between mt-3 md:mt-4">
             <div>
               {comingSoon || !showPrices ? (
-                <div className="text-[10px] uppercase tracking-[1.5px] text-gray-400 font-semibold">
+                <div className="text-[9px] md:text-[10px] uppercase tracking-[1.5px] text-gray-400 font-semibold">
                   PRICE REVEALING SOON
                 </div>
               ) : (
                 <div>
-                  <div className="text-[10px] uppercase tracking-[1.5px] text-gray-400 font-semibold">
+                  <div className="text-[9px] md:text-[10px] uppercase tracking-[1.5px] text-gray-400 font-semibold">
                     {formatPrice(product.price)}
                   </div>
                   {isOnSale && (
-                    <div className="text-[9px] text-gray-400 line-through mt-0.5">
+                    <div className="text-[8px] md:text-[9px] text-gray-400 line-through mt-0.5">
                       {formatPrice(product.compare_at_price)}
                     </div>
                   )}
@@ -181,7 +155,7 @@ export default function ProductCard({ product }) {
               )}
             </div>
 
-            <span className="bg-black text-white text-[9px] font-bold tracking-[1px] px-3 py-1.5 rounded-[8px] uppercase">
+            <span className="bg-black text-white text-[8px] md:text-[9px] font-bold tracking-[1px] px-2 md:px-3 py-1 md:py-1.5 rounded-[6px] md:rounded-[8px] uppercase">
               Premium
             </span>
           </div>
