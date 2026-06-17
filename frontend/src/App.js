@@ -47,9 +47,12 @@ import AdminBlog from "@/pages/admin/AdminBlog";
 import AdminFAQ from "@/pages/admin/AdminFAQ";
 import AdminReturns from "@/pages/admin/AdminReturns";
 import AdminFlashSales from "@/pages/admin/AdminFlashSales";
+import AdminStock from "@/pages/admin/AdminStock";
 import AdminNewsletter from "@/pages/admin/AdminNewsletter";
 import AdminExport from "@/pages/admin/AdminExport";
 import AdminStaff from "@/pages/admin/AdminStaff";
+import BusinessDashboard from "@/pages/admin/BusinessDashboard";
+import AdminGuide from "@/pages/admin/AdminGuide";
 import Contact from "@/pages/Contact";
 import About from "@/pages/About";
 import OurStory from "@/pages/OurStory";
@@ -160,7 +163,9 @@ function App() {
                 <Route path="/admin/login" element={<AdminLogin />} />
                 <Route path="/admin" element={<ProtectedRoute requireAdmin><AdminLayout /></ProtectedRoute>}>
                   <Route index element={<AdminDashboard />} />
+                  <Route path="business-dashboard" element={<BusinessDashboard />} />
                   <Route path="products" element={<AdminProducts />} />
+                  <Route path="stock" element={<AdminStock />} />
                   <Route path="orders" element={<AdminOrders />} />
                   <Route path="referrals" element={<AdminReferrals />} />
                   <Route path="customers" element={<AdminCustomers />} />
@@ -180,6 +185,7 @@ function App() {
                   <Route path="export" element={<AdminExport />} />
                   <Route path="staff" element={<AdminStaff />} />
                   <Route path="settings" element={<AdminSettings />} />
+                  <Route path="guide" element={<AdminGuide />} />
                 </Route>
               </Routes>
             </BrowserRouter>

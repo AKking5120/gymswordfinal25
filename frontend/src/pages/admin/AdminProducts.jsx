@@ -130,7 +130,7 @@ export default function AdminProducts() {
       <div className="flex justify-between items-center">
         <div>
           <div className="text-overline text-white/50">Catalog</div>
-          <h1 className="font-display uppercase font-black text-4xl mt-2">Products</h1>
+          <h1 className="font-display uppercase font-black text-4xl mt-2">Inventory</h1>
         </div>
         <button data-testid={ADMIN.productNew} onClick={startNew} className="btn-luxury-light"><Plus size={14} className="mr-2" /> New Product</button>
       </div>

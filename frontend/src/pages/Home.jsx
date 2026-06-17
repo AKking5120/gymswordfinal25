@@ -131,7 +131,7 @@ export default function Home() {
             <div>
               <div className="text-overline mb-3 text-black/50">Customer Favourites</div>
               <h2 className="font-display uppercase font-black text-4xl sm:text-5xl tracking-tight">
-                Best Sellers
+                Top Selling
               </h2>
             </div>
             <Link to="/shop" className="luxury-link text-overline">

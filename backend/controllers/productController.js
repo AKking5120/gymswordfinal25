@@ -35,7 +35,19 @@ const getProducts = async (req, res) => {
     if (product_type) query = query.eq('product_type', product_type);
     if (featured === 'true') query = query.eq('is_featured', true);
     if (trending === 'true') query = query.eq('is_trending', true);
-    if (best_sellers === 'true') query = query.order('rating', { ascending: false });
+    if (best_sellers === 'true') {
+      const { data: salesData } = await supabase
+        .from('order_items')
+        .select('product_id, quantity, orders!inner(status)')
+        .neq('orders.status', 'cancelled');
+      const salesMap = {};
+      (salesData || []).forEach(item => {
+        if (item.orders?.status === 'cancelled') return;
+        salesMap[item.product_id] = (salesMap[item.product_id] || 0) + (item.quantity || 0);
+      });
+      const topIds = Object.entries(salesMap).sort((a, b) => b[1] - a[1]).slice(0, 20).map(([id]) => id);
+      if (topIds.length > 0) query = query.in('id', topIds);
+    }
     if (gender) query = query.eq('gender', gender);
     if (min_price) query = query.gte('price', min_price);
     if (max_price) query = query.lte('price', max_price);

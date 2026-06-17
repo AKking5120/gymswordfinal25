@@ -162,7 +162,7 @@ const exportData = async (req, res) => {
     let data, columns;
     if (type === 'products') {
       const { data: d } = await supabase.from('products').select('*').order('created_at', { ascending: false });
-      data = d || []; columns = ['name', 'price', 'sale_price', 'category', 'product_type', 'gender', 'stock', 'is_active', 'is_sale'];
+      data = d || []; columns = ['name', 'price', 'sale_price', 'category', 'product_type', 'gender', 'stock_quantity', 'is_active', 'is_sale'];
     } else if (type === 'orders') {
       const { data: d } = await supabase.from('orders').select('*, users(email)').order('created_at', { ascending: false });
       data = (d || []).map(o => ({ order_number: `GS-${String(o.id).padStart(6, '0')}`, customer: o.users?.email || '', status: o.status, total: o.total_amount, payment_method: o.payment_method, created_at: o.created_at }));

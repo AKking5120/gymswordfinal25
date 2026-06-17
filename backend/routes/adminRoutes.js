@@ -25,6 +25,7 @@ const {
   getSubscribers, exportSubscribers,
   exportData, getAdminStaff, updateStaffRole,
 } = require('../controllers/adminFeaturesController');
+const businessDash = require('../controllers/businessDashboardController');
 const { protect } = require('../middleware/authMiddleware');
 const { adminOnly } = require('../middleware/adminMiddleware');
 
@@ -35,6 +36,17 @@ router.get('/stats', getStats);
 router.get('/settings', getAdminSettings);
 router.patch('/settings', updateAdminSettings);
 router.post('/uploads', uploadImage);
+
+// Business Dashboard
+router.get('/business-dashboard/overview', businessDash.getOverview);
+router.get('/business-dashboard/sales', businessDash.getSales);
+router.get('/business-dashboard/products', businessDash.getProducts);
+router.get('/business-dashboard/customers', businessDash.getCustomers);
+router.get('/business-dashboard/inventory', businessDash.getInventory);
+router.get('/business-dashboard/traffic', businessDash.getTraffic);
+router.get('/business-dashboard/orders', businessDash.getOrderAnalytics);
+router.get('/business-dashboard/payments', businessDash.getPayments);
+router.get('/business-dashboard/activities', businessDash.getRecentActivities);
 
 // Orders
 router.get('/orders', getAllOrders);

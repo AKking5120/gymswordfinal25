@@ -17,7 +17,7 @@ export default function AdminDashboard() {
     <div className="space-y-10">
       <div>
         <div className="text-overline text-white/50">Overview</div>
-        <h1 className="font-display uppercase font-black text-4xl sm:text-5xl mt-2">Dashboard</h1>
+        <h1 className="font-display uppercase font-black text-4xl sm:text-5xl mt-2">Home</h1>
       </div>
       <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <Stat label="Revenue" value={formatPriceCompact(stats.total_revenue)} />
@@ -42,21 +42,27 @@ export default function AdminDashboard() {
         </div>
         <div className="bg-white/5 border border-white/10 p-6">
           <div className="text-overline text-white/50 mb-4">Top Products</div>
-          <div className="h-72">
-            <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={stats.top_products}>
-                <XAxis dataKey="name" stroke="#666" fontSize={10} hide />
-                <YAxis stroke="#666" fontSize={10} />
-                <Tooltip contentStyle={{ background: "#000", border: "1px solid #333" }} />
-                <Bar dataKey="qty" fill="#fff" />
-              </BarChart>
-            </ResponsiveContainer>
-          </div>
-          <div className="mt-4 space-y-1 text-xs text-white/70">
-            {stats.top_products.map((p, i) => (
-              <div key={i} className="flex justify-between"><span className="truncate">{p.name}</span><span>{p.qty} sold</span></div>
-            ))}
-          </div>
+          {stats.top_products?.length > 0 ? (
+            <>
+              <div className="h-60">
+                <ResponsiveContainer width="100%" height="100%">
+                  <BarChart data={stats.top_products}>
+                    <XAxis dataKey="name" stroke="#666" fontSize={10} hide />
+                    <YAxis stroke="#666" fontSize={10} />
+                    <Tooltip contentStyle={{ background: "#000", border: "1px solid #333" }} />
+                    <Bar dataKey="qty" fill="#fff" radius={[2, 2, 0, 0]} />
+                  </BarChart>
+                </ResponsiveContainer>
+              </div>
+              <div className="mt-4 space-y-1 text-xs text-white/70">
+                {stats.top_products.map((p, i) => (
+                  <div key={i} className="flex justify-between"><span className="truncate">{p.name}</span><span>{p.qty} sold</span></div>
+                ))}
+              </div>
+            </>
+          ) : (
+            <div className="h-60 flex items-center justify-center text-sm text-white/40">No sales data yet</div>
+          )}
         </div>
       </div>
       <div className="bg-white/5 border border-white/10 p-6">
