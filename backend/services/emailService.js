@@ -34,11 +34,13 @@ async function logEmail(userId, type, recipient, subject, status, error) {
 
 async function sendMail({ to, subject, html, userId, type, attachments }) {
   try {
-    await transporter.sendMail({ from: FROM, to, subject, html, attachments });
+    const info = await transporter.sendMail({ from: FROM, to, subject, html, attachments });
+    console.log(`Email (${type}) sent to ${to}:`, info.messageId);
     await logEmail(userId, type, to, subject, 'sent');
   } catch (err) {
+    console.error(`Email (${type}) failed for ${to}:`, err.message, err.stack);
     await logEmail(userId, type, to, subject, 'failed', err.message);
-    console.error(`Email (${type}) failed:`, err.message);
+    throw err;
   }
 }
 
