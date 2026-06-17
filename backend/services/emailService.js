@@ -12,6 +12,7 @@ const transporter = nodemailer.createTransport({
   connectionTimeout: 10000,
   greetingTimeout: 10000,
   socketTimeout: 15000,
+  family: 4,
 });
 
 const FROM = process.env.SMTP_FROM || 'noreply@gymsword.com';
