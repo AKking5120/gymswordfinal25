@@ -59,7 +59,7 @@ export function formatApiErrorDetail(detail) {
 }
 
 export function resolveImage(url) {
-  if (!url) return "";
+  if (!url || url === "undefined" || url === "null") return PRODUCT_IMAGE_PLACEHOLDER;
   if (url.startsWith("http") || url.startsWith("data:")) return url;
   return `${BACKEND_URL}${url}`;
 }

@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
-import { Heart, ShoppingBag, Star, Truck, ShieldCheck, RotateCcw, ChevronDown, ChevronRight, ChevronLeft, Package, Award } from "lucide-react";
+import { Heart, ShoppingBag, RotateCw, Sparkles, Star, Truck, ShieldCheck, RotateCcw, ChevronDown, ChevronRight, ChevronLeft, Package, Award } from "lucide-react";
 import { toast } from "sonner";
 import { api, resolveImage, PRODUCT_IMAGE_PLACEHOLDER, formatApiErrorDetail } from "@/lib/api";
 import { formatPrice } from "@/lib/currency";
@@ -10,6 +10,7 @@ import { useWishlist } from "@/context/WishlistContext";
 import { useSite } from "@/context/SiteContext";
 import Layout from "@/components/Layout";
 import ProductCard from "@/components/ProductCard";
+import ComingSoonModal from "@/components/ComingSoonModal";
 import { PRODUCT } from "@/constants/testIds";
 
 export default function ProductDetail() {
@@ -29,6 +30,8 @@ export default function ProductDetail() {
   const { add } = useCart();
   const { toggle, has } = useWishlist();
   const { settings } = useSite();
+  const [show360, setShow360] = useState(false);
+  const [showTryOn, setShowTryOn] = useState(false);
 
   useEffect(() => {
     api.get(`/products/${id}`).then(({ data }) => {
@@ -370,6 +373,24 @@ export default function ProductDetail() {
               )}
             </div>
 
+            {/* 360° View & Try Now */}
+            <div className="mt-4 flex gap-2">
+              <button
+                onClick={() => setShow360(true)}
+                className="flex items-center justify-center gap-1.5 text-[10px] font-bold uppercase tracking-[0.12em] text-black/50 hover:text-black px-4 py-2.5 border border-black/15 hover:border-black/40 transition-all"
+              >
+                <RotateCw size={13} />
+                360° View
+              </button>
+              <button
+                onClick={() => setShowTryOn(true)}
+                className="flex items-center justify-center gap-1.5 text-[10px] font-bold uppercase tracking-[0.12em] text-black/50 hover:text-black px-4 py-2.5 border border-black/15 hover:border-black/40 transition-all"
+              >
+                <Sparkles size={13} />
+                Try Now
+              </button>
+            </div>
+
             {/* Description */}
             {product.description && (
               <p className="mt-5 text-[13px] text-black/50 leading-[1.8]">{product.description}</p>
@@ -555,6 +576,22 @@ export default function ProductDetail() {
           </section>
         )}
       </div>
+
+      <ComingSoonModal
+        open={show360}
+        onClose={() => setShow360(false)}
+        title="360° Product View"
+        message="GymSword immersive 360° viewing experience is under development."
+        icon={<RotateCw size={32} className="text-black/30" />}
+      />
+
+      <ComingSoonModal
+        open={showTryOn}
+        onClose={() => setShowTryOn(false)}
+        title="Virtual Try-On"
+        message="GymSword AI-powered Try-On experience is under development."
+        icon={<Sparkles size={32} className="text-black/30" />}
+      />
     </Layout>
   );
 }

@@ -12,3 +12,6 @@ Thumbs.db
 .vscode/
 .idea/
 uploads/
+
+# Local Netlify folder
+.netlify

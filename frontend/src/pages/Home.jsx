@@ -8,8 +8,8 @@ import { HOME } from "@/constants/testIds";
 import HeroSlider from "@/components/HeroSlider";
 import TopCollections from "@/components/TopCollections";
 
-const LOOKBOOK_1 = "https://images.unsplash.com/photo-1579758629938-03607ccdbaba?crop=entropy&cs=srgb&fm=jpg&q=85";
-const LOOKBOOK_2 = "https://images.unsplash.com/photo-1579758682665-53a1a614eea6?crop=entropy&cs=srgb&fm=jpg&q=85";
+const LOOKBOOK_1 = "https://res.cloudinary.com/de6pxtiom/image/upload/v1781685743/gymsword/cinvnxk0qzr3uyj5arzp.png";
+const LOOKBOOK_2 = "https://res.cloudinary.com/de6pxtiom/image/upload/v1781685735/gymsword/akinjqm2t4a7yla2la8e.png";
 const ABOUT_BG = "https://images.pexels.com/photos/17211446/pexels-photo-17211446.jpeg";
 
 export default function Home() {
@@ -37,11 +37,7 @@ export default function Home() {
         <div className="flex scroll-marquee whitespace-nowrap text-overline text-2xl md:text-3xl gap-12">
           {[...Array(4)].map((_, i) => (
             <div key={i} className="flex items-center gap-12">
-              <span>Forge Your Strength</span>
-              <span className="opacity-30">✦</span>
-              <span>Engineered Without Compromise</span>
-              <span className="opacity-30">✦</span>
-              <span>Luxury Athleisure</span>
+              <span>IDENTITY OF MODERN WARRIORS</span>
               <span className="opacity-30">✦</span>
             </div>
           ))}

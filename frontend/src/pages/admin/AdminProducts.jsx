@@ -35,6 +35,8 @@ const EMPTY = {
   is_trending: false,
   is_sale: false,
   is_new_arrival: false,
+  enable_360_view: false,
+  enable_try_now: false,
 
   rating: 0,
   review_count: 0,
@@ -60,9 +62,17 @@ export default function AdminProducts() {
   const [editing, setEditing] = useState(null);
   const fileInput = useRef();
   const [uploading, setUploading] = useState(false);
+  const [search, setSearch] = useState("");
 
   const load = () => api.get("/admin/products").then(({ data }) => setProducts(data)).catch(() => setProducts([]));
   useEffect(() => { load(); }, []);
+
+  const filtered = search
+    ? products.filter((p) =>
+        [p.name, p.category, p.product_type, String(p.price), String(p.id)]
+          .some((field) => field?.toLowerCase().includes(search.toLowerCase()))
+      )
+    : products;
 
   const startNew = () => setEditing({ ...EMPTY });
 
@@ -132,7 +142,19 @@ export default function AdminProducts() {
           <div className="text-overline text-white/50">Catalog</div>
           <h1 className="font-display uppercase font-black text-4xl mt-2">Inventory</h1>
         </div>
-        <button data-testid={ADMIN.productNew} onClick={startNew} className="btn-luxury-light"><Plus size={14} className="mr-2" /> New Product</button>
+        <div className="flex items-center gap-3">
+          <div className="relative flex-1 max-w-xs">
+            <input
+              type="text"
+              placeholder="Search products..."
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              className="w-full bg-transparent border border-white/10 pl-9 pr-3 py-2 text-sm text-white/80 placeholder-white/30 focus:outline-none focus:border-white/30 transition-colors"
+            />
+            <svg className="absolute left-3 top-1/2 -translate-y-1/2 text-white/30" size={14} width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+          </div>
+          <button data-testid={ADMIN.productNew} onClick={startNew} className="btn-luxury-light"><Plus size={14} className="mr-2" /> New Product</button>
+        </div>
       </div>
 
       <div className="bg-white/5 border border-white/10 overflow-x-auto">
@@ -142,7 +164,7 @@ export default function AdminProducts() {
 <th className="text-left">Sub Category</th><th className="text-left">Price</th><th className="text-left">Active</th><th></th></tr>
           </thead>
           <tbody>
-            {products.map((p) => (
+            {filtered.map((p) => (
               <tr key={p.id} className="border-b border-white/5">
                 <td className="p-4 flex items-center gap-3">
                   {p.images?.[0] && <img src={resolveImage(p.images[0].url)} alt="" className="w-12 h-14 object-cover" />}
@@ -238,6 +260,14 @@ export default function AdminProducts() {
               <label className="flex items-center gap-2 text-sm sm:col-span-2">
                 <input type="checkbox" checked={editing.is_active} onChange={(e) => setEditing({ ...editing, is_active: e.target.checked })} />
                 Active (visible on storefront)
+              </label>
+              <label className="flex items-center gap-2 text-sm sm:col-span-2">
+                <input type="checkbox" checked={editing.enable_360_view} onChange={(e) => setEditing({ ...editing, enable_360_view: e.target.checked })} />
+                Enable 360° View
+              </label>
+              <label className="flex items-center gap-2 text-sm sm:col-span-2">
+                <input type="checkbox" checked={editing.enable_try_now} onChange={(e) => setEditing({ ...editing, enable_try_now: e.target.checked })} />
+                Enable Try Now
               </label>
             </div>
             <div className="mt-8 flex gap-3 justify-end">

@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { X, Heart, ShoppingBag, ChevronRight, ChevronLeft, Eye } from "lucide-react";
+import { X, Heart, ShoppingBag, RotateCw, Sparkles, ChevronRight, ChevronLeft, Eye } from "lucide-react";
 import { toast } from "sonner";
 import { useWishlist } from "@/context/WishlistContext";
 import { useAuth } from "@/context/AuthContext";
@@ -8,6 +8,7 @@ import { useCart } from "@/context/CartContext";
 import { useSite } from "@/context/SiteContext";
 import { resolveImage, PRODUCT_IMAGE_PLACEHOLDER } from "@/lib/api";
 import { formatPrice } from "@/lib/currency";
+import ComingSoonModal from "@/components/ComingSoonModal";
 
 export default function QuickView({ product, initialSize, onClose }) {
   const { has, toggle } = useWishlist();
@@ -20,6 +21,8 @@ export default function QuickView({ product, initialSize, onClose }) {
   const [selectedSize, setSelectedSize] = useState(initialSize || product.sizes?.[0] || "");
   const [selectedColor, setSelectedColor] = useState(product.colors?.[0] || "");
   const [adding, setAdding] = useState(false);
+  const [show360, setShow360] = useState(false);
+  const [showTryOn, setShowTryOn] = useState(false);
 
   const images = product.images?.length ? product.images : [{ url: "" }];
   const isOnSale = product.compare_at_price && product.compare_at_price > product.price;
@@ -266,6 +269,22 @@ export default function QuickView({ product, initialSize, onClose }) {
                   {has(product.id) ? "Saved" : "Save to Wishlist"}
                 </button>
 
+                <button
+                  onClick={() => setShow360(true)}
+                  className="w-full flex items-center justify-center gap-2 text-[11px] font-bold uppercase tracking-[0.12em] text-black/50 hover:text-black py-2.5 border border-black/10 hover:border-black/30 transition-all"
+                >
+                  <RotateCw size={13} />
+                  360° View
+                </button>
+
+                <button
+                  onClick={() => setShowTryOn(true)}
+                  className="w-full flex items-center justify-center gap-2 text-[11px] font-bold uppercase tracking-[0.12em] text-black/50 hover:text-black py-2.5 border border-black/10 hover:border-black/30 transition-all"
+                >
+                  <Sparkles size={13} />
+                  Try Now
+                </button>
+
                 <Link
                   to={`/product/${product.id}`}
                   onClick={onClose}
@@ -279,6 +298,23 @@ export default function QuickView({ product, initialSize, onClose }) {
           </div>
         </div>
       </div>
+
+      <ComingSoonModal
+        open={show360}
+        onClose={() => setShow360(false)}
+        title="360° Product View"
+        message="GymSword immersive 360° viewing experience is under development."
+        icon={<RotateCw size={32} className="text-black/30" />}
+      />
+
+      <ComingSoonModal
+        open={showTryOn}
+        onClose={() => setShowTryOn(false)}
+        title="Virtual Try-On"
+        message="GymSword AI-powered Try-On experience is under development."
+        icon={<Sparkles size={32} className="text-black/30" />}
+      />
     </>
   );
 }
+

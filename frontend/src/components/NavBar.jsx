@@ -117,6 +117,7 @@ export default function NavBar() {
   const { user, logout } = useAuth();
   const { cart } = useCart();
   const { items: wlItems } = useWishlist();
+
   const [open, setOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
   const [activeDropdown, setActiveDropdown] = useState(null);
@@ -360,7 +361,7 @@ export default function NavBar() {
                       <div key={l.to} className="border-b border-gray-100">
                         <button
                           onClick={() => toggleMobileAccordion(megaKey)}
-                          className="w-full flex items-center justify-between py-4 text-lg font-semibold uppercase tracking-wider"
+                            className="w-full flex items-center justify-between py-4 text-lg font-semibold uppercase tracking-wider"
                         >
                           <span>{l.label}</span>
                           <ChevronDown
@@ -486,3 +487,4 @@ export default function NavBar() {
     </>
   );
 }
+

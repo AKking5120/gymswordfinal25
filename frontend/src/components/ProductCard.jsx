@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { Heart, Eye } from "lucide-react";
+import { Heart, Eye, RotateCw, Sparkles } from "lucide-react";
 import { useWishlist } from "@/context/WishlistContext";
 import { useAuth } from "@/context/AuthContext";
 import { useSite } from "@/context/SiteContext";
@@ -8,6 +8,7 @@ import { resolveImage, PRODUCT_IMAGE_PLACEHOLDER } from "@/lib/api";
 import { formatPrice } from "@/lib/currency";
 import { PRODUCT } from "@/constants/testIds";
 import QuickView from "@/components/QuickView";
+import ComingSoonModal from "@/components/ComingSoonModal";
 
 export default function ProductCard({ product }) {
   const { has, toggle } = useWishlist();
@@ -17,6 +18,8 @@ export default function ProductCard({ product }) {
 
   const [quickViewOpen, setQuickViewOpen] = useState(false);
   const [selectedSize, setSelectedSize] = useState("");
+  const [show360, setShow360] = useState(false);
+  const [showTryOn, setShowTryOn] = useState(false);
 
   const img = product.images?.[0]?.url ? resolveImage(product.images[0].url) : PRODUCT_IMAGE_PLACEHOLDER;
   const isOnSale = product.compare_at_price && product.compare_at_price > product.price;
@@ -35,6 +38,18 @@ export default function ProductCard({ product }) {
     e.preventDefault();
     e.stopPropagation();
     setQuickViewOpen(true);
+  };
+
+  const handle360 = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setShow360(true);
+  };
+
+  const handleTryOn = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setShowTryOn(true);
   };
 
   return (
@@ -75,6 +90,24 @@ export default function ProductCard({ product }) {
               data-testid={`wishlist-toggle-${product.id}`}
             >
               <Heart size={15} className="text-black" fill={has(product.id) ? "#000" : "none"} />
+            </button>
+
+            <button
+              onClick={handle360}
+              className="absolute top-3 right-3 z-10 w-9 h-9 rounded-full bg-white/80 backdrop-blur-sm border border-gray-200 flex items-center justify-center hover:bg-white transition"
+              style={{ marginTop: "44px" }}
+              aria-label="360° View"
+            >
+              <RotateCw size={14} className="text-black" />
+            </button>
+
+            <button
+              onClick={handleTryOn}
+              className="absolute top-3 right-3 z-10 w-9 h-9 rounded-full bg-white/80 backdrop-blur-sm border border-gray-200 flex items-center justify-center hover:bg-white transition"
+              style={{ marginTop: "88px" }}
+              aria-label="Try Now"
+            >
+              <Sparkles size={14} className="text-black" />
             </button>
 
             {/* QUICK VIEW BUTTON — hover */}
@@ -158,6 +191,23 @@ export default function ProductCard({ product }) {
       {quickViewOpen && (
         <QuickView product={product} initialSize={selectedSize} onClose={() => { setQuickViewOpen(false); setSelectedSize(""); }} />
       )}
+
+      <ComingSoonModal
+        open={show360}
+        onClose={() => setShow360(false)}
+        title="360° Product View"
+        message="GymSword immersive 360° viewing experience is under development."
+        icon={<RotateCw size={32} className="text-black/30" />}
+      />
+
+      <ComingSoonModal
+        open={showTryOn}
+        onClose={() => setShowTryOn(false)}
+        title="Virtual Try-On"
+        message="GymSword AI-powered Try-On experience is under development."
+        icon={<Sparkles size={32} className="text-black/30" />}
+      />
     </>
   );
 }
+

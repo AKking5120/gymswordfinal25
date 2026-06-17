@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import { useNavigate } from "react-router-dom";
 
 const slides = [
   {
@@ -22,11 +23,12 @@ const slides = [
 
 const HeroSlider = () => {
   const [index, setIndex] = useState(0);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const interval = setInterval(() => {
       setIndex((prev) => (prev + 1) % slides.length);
-    }, 2000);
+    }, 4000);
 
     return () => clearInterval(interval);
   }, []);
@@ -74,12 +76,12 @@ const HeroSlider = () => {
               </p>
 
               <div className="flex flex-wrap gap-4 mt-8">
-                <button className="bg-black text-white px-8 lg:px-12 py-4 rounded-full font-semibold hover:scale-105 transition">
+                <button onClick={() => navigate("/shop")} className="bg-black text-white px-8 lg:px-12 py-4 rounded-full font-semibold hover:scale-105 transition">
                   Shop Collection
                 </button>
 
-                <button className="border border-black px-8 lg:px-12 py-4 rounded-full hover:bg-black hover:text-white transition">
-                  Explore More
+                <button onClick={() => navigate("/signup")} className="border border-black px-8 lg:px-12 py-4 rounded-full hover:bg-black hover:text-white transition">
+                  Join Us
                 </button>
               </div>
             </motion.div>

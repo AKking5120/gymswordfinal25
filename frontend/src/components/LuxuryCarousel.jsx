@@ -108,3 +108,4 @@ export default function LuxuryCarousel({ children, className = "" }) {
     </div>
   );
 }
+

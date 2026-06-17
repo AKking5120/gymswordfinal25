@@ -63,6 +63,7 @@ import RefundPolicy from "@/pages/RefundPolicy";
 import ExchangePolicy from "@/pages/ExchangePolicy";
 import SizeGuide from "@/pages/SizeGuide";
 import Blog from "@/pages/Blog";
+import BlogDetail from "@/pages/BlogDetail";
 import Careers from "@/pages/Careers";
 import Affiliate from "@/pages/Affiliate";
 import ReferralProgram from "@/pages/ReferralProgram";
@@ -132,6 +133,7 @@ function App() {
                 <Route path="/exchange-policy" element={<ExchangePolicy />} />
                 <Route path="/size-guide" element={<SizeGuide />} />
                 <Route path="/blog" element={<Blog />} />
+                <Route path="/blog/:slug" element={<BlogDetail />} />
                 <Route path="/careers" element={<Careers />} />
                 <Route path="/affiliate" element={<Affiliate />} />
                 <Route path="/referral-program" element={<ReferralProgram />} />
