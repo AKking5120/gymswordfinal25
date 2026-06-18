@@ -3,28 +3,24 @@ const supabase = require('../config/db');
 
 let transporter;
 try {
+  const smtpHost = process.env.SMTP_HOST || 'smtp.gmail.com';
+  const smtpUser = process.env.SMTP_USER || '';
+  const smtpPass = process.env.SMTP_PASS || '';
+
+  // Try port 587 (STARTTLS) first â€” works on most hosts including Render
   transporter = nodemailer.createTransport({
-    host: process.env.SMTP_HOST || 'smtp.gmail.com',
-    port: parseInt(process.env.SMTP_PORT) || 587,
-    secure: process.env.SMTP_SECURE === 'true',
-    auth: {
-      user: process.env.SMTP_USER,
-      pass: process.env.SMTP_PASS,
-    },
-    connectionTimeout: 10000,
-    greetingTimeout: 10000,
-    socketTimeout: 15000,
+    host: smtpHost,
+    port: 587,
+    secure: false,
+    auth: { user: smtpUser, pass: smtpPass },
+    connectionTimeout: 15000,
+    greetingTimeout: 15000,
+    socketTimeout: 20000,
     family: 4,
+    tls: { rejectUnauthorized: false },
   });
 } catch {
   transporter = null;
-}
-
-function getTransporter() {
-  if (transporter) return transporter;
-  // Create a no-op transport that logs instead of sending
-  const noop = { sendMail: async () => ({ messageId: 'noop' }) };
-  return noop;
 }
 
 const FROM = process.env.SMTP_FROM || 'noreply@gymsword.com';
@@ -46,37 +42,37 @@ async function logEmail(userId, type, recipient, subject, status, error) {
 }
 
 async function sendMail({ to, subject, html, userId, type, attachments }) {
-  try {
-    const info = await getTransporter().sendMail({ from: FROM, to, subject, html, attachments });
-    console.log(`Email (${type}) sent to ${to}:`, info.messageId);
-    await logEmail(userId, type, to, subject, 'sent');
-    return;
-  } catch (err) {
-    console.error(`Email (${type}) SMTP failed for ${to}:`, err.message);
-  }
+  const smtpHost = process.env.SMTP_HOST || 'smtp.gmail.com';
+  const smtpUser = process.env.SMTP_USER || '';
+  const smtpPass = process.env.SMTP_PASS || '';
 
-  // Fallback: Resend HTTP API (works on Render, no SMTP port needed)
-  if (process.env.RESEND_API_KEY) {
+  const trySend = async (port, secure) => {
+    const t = nodemailer.createTransport({
+      host: smtpHost, port, secure,
+      auth: { user: smtpUser, pass: smtpPass },
+      connectionTimeout: 15000,
+      greetingTimeout: 15000,
+      socketTimeout: 20000,
+      family: 4,
+      tls: { rejectUnauthorized: false },
+    });
+    return t.sendMail({ from: FROM, to, subject, html, attachments });
+  };
+
+  // Try 587 (STARTTLS) first, then 465 (SSL) as fallback
+  for (const [port, secure] of [[587, false], [465, true]]) {
     try {
-      const res = await fetch('https://api.resend.com/emails', {
-        method: 'POST',
-        headers: { 'Authorization': `Bearer ${process.env.RESEND_API_KEY}`, 'Content-Type': 'application/json' },
-        body: JSON.stringify({ from: FROM, to: [to], subject, html }),
-      });
-      if (res.ok) {
-        console.log(`Email (${type}) sent via Resend to ${to}`);
-        await logEmail(userId, type, to, subject, 'sent');
-        return;
-      }
-      const errText = await res.text();
-      console.error(`Resend API error: ${errText}`);
-    } catch (e) {
-      console.error('Resend fallback failed:', e.message);
+      const info = await trySend(port, secure);
+      console.log(`Email (${type}) sent to ${to} via port ${port}:`, info.messageId);
+      await logEmail(userId, type, to, subject, 'sent');
+      return;
+    } catch (err) {
+      console.error(`Email (${type}) failed on port ${port}:`, err.message);
     }
   }
 
-  await logEmail(userId, type, to, subject, 'failed', 'SMTP timeout + no Resend fallback');
-  console.log(`[OTP LOG] Email would have been sent to ${to} â€” check console for OTP`);
+  await logEmail(userId, type, to, subject, 'failed');
+  console.log(`[OTP LOG] Email would go to ${to} â€” check above for OTP in logs`);
 }
 
 // â”€â”€â”€ Shared Styles â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
