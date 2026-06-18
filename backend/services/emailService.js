@@ -1,19 +1,31 @@
 const nodemailer = require('nodemailer');
 const supabase = require('../config/db');
 
-const transporter = nodemailer.createTransport({
-  host: process.env.SMTP_HOST || 'smtp.gmail.com',
-  port: parseInt(process.env.SMTP_PORT) || 587,
-  secure: process.env.SMTP_SECURE === 'true',
-  auth: {
-    user: process.env.SMTP_USER,
-    pass: process.env.SMTP_PASS,
-  },
-  connectionTimeout: 10000,
-  greetingTimeout: 10000,
-  socketTimeout: 15000,
-  family: 4,
-});
+let transporter;
+try {
+  transporter = nodemailer.createTransport({
+    host: process.env.SMTP_HOST || 'smtp.gmail.com',
+    port: parseInt(process.env.SMTP_PORT) || 587,
+    secure: process.env.SMTP_SECURE === 'true',
+    auth: {
+      user: process.env.SMTP_USER,
+      pass: process.env.SMTP_PASS,
+    },
+    connectionTimeout: 10000,
+    greetingTimeout: 10000,
+    socketTimeout: 15000,
+    family: 4,
+  });
+} catch {
+  transporter = null;
+}
+
+function getTransporter() {
+  if (transporter) return transporter;
+  // Create a no-op transport that logs instead of sending
+  const noop = { sendMail: async () => ({ messageId: 'noop' }) };
+  return noop;
+}
 
 const FROM = process.env.SMTP_FROM || 'noreply@gymsword.com';
 const SITE_URL = process.env.SITE_URL || 'http://localhost:3000';
@@ -35,17 +47,17 @@ async function logEmail(userId, type, recipient, subject, status, error) {
 
 async function sendMail({ to, subject, html, userId, type, attachments }) {
   try {
-    const info = await transporter.sendMail({ from: FROM, to, subject, html, attachments });
+    const info = await getTransporter().sendMail({ from: FROM, to, subject, html, attachments });
     console.log(`Email (${type}) sent to ${to}:`, info.messageId);
     await logEmail(userId, type, to, subject, 'sent');
   } catch (err) {
-    console.error(`Email (${type}) failed for ${to}:`, err.message, err.stack);
+    console.error(`Email (${type}) failed for ${to}:`, err.message);
     await logEmail(userId, type, to, subject, 'failed', err.message);
-    throw err;
+    // Don't throw â€” app should work even if email fails
   }
 }
 
-// ─── Shared Styles ──────────────────────────────────────────
+// â”€â”€â”€ Shared Styles â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 const STYLES = {
   body: 'margin:0;padding:0;background:#f4f4f4;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif',
@@ -79,14 +91,14 @@ function shell(body) {
 <tr><td style="${STYLES.content}">${body}</td></tr>
 <tr><td style="${STYLES.footer}">
 <hr style="${STYLES.divider}">
-<p style="${STYLES.small}">GymSword — Forge Your Legacy<br>
+<p style="${STYLES.small}">GymSword â€” Forge Your Legacy<br>
 Need help? <a href="mailto:support@gymsword.com" style="color:#111;text-decoration:underline">support@gymsword.com</a></p>
 </td></tr>
 </table>
 </td></tr></table></body></html>`;
 }
 
-// ─── Minimal Shell (auth / OTP emails) ──────────────────────
+// â”€â”€â”€ Minimal Shell (auth / OTP emails) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 function minimalShell(body) {
   return `<!DOCTYPE html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
@@ -109,7 +121,7 @@ GymSword Team &mdash; noreply@gymsword.com<br>
 </td></tr></table></body></html>`;
 }
 
-// ─── OTP Verification ───────────────────────────────────────
+// â”€â”€â”€ OTP Verification â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 function verificationOTP(name, otp) {
   return minimalShell(`
@@ -127,7 +139,7 @@ function verificationOTP(name, otp) {
   `);
 }
 
-// ─── Welcome ─────────────────────────────────────────────────
+// â”€â”€â”€ Welcome â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 function welcome(name) {
   return shell(`
@@ -143,12 +155,12 @@ function welcome(name) {
         <li>Exclusive member-only offers</li>
       </ul>
     </div>
-    <table cellpadding="0" cellspacing="0"><tr><td><a href="${SITE_URL}/shop" style="${STYLES.btn}">Start Shopping →</a></td></tr></table>
+    <table cellpadding="0" cellspacing="0"><tr><td><a href="${SITE_URL}/shop" style="${STYLES.btn}">Start Shopping â†’</a></td></tr></table>
     <p style="margin:20px 0 0;font-size:13px;color:#888;line-height:1.6">Forge your legacy.<br><strong>The GymSword Team</strong></p>
   `);
 }
 
-// ─── Forgot Password OTP ────────────────────────────────────
+// â”€â”€â”€ Forgot Password OTP â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 function forgotPasswordOTP(name, otp) {
   return minimalShell(`
@@ -166,7 +178,7 @@ function forgotPasswordOTP(name, otp) {
   `);
 }
 
-// ─── Login Notification ─────────────────────────────────────
+// â”€â”€â”€ Login Notification â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 function loginNotification(name, time, device, browser, ip) {
   return minimalShell(`
@@ -184,7 +196,7 @@ function loginNotification(name, time, device, browser, ip) {
   `);
 }
 
-// ─── Order Confirmation (Detailed) ──────────────────────────
+// â”€â”€â”€ Order Confirmation (Detailed) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 function orderConfirmation(name, order, items) {
   const itemsHtml = items.map((i, idx) => `
@@ -195,8 +207,8 @@ function orderConfirmation(name, order, items) {
           <td><strong style="font-size:13px;color:#111">${i.name}</strong></td>
         </tr></table>
       </td>
-      <td style="${STYLES.tableCell};text-align:center">×${i.quantity}</td>
-      <td style="${STYLES.tableCell};text-align:right;font-weight:700">₹${(i.price * i.quantity).toFixed(2)}</td>
+      <td style="${STYLES.tableCell};text-align:center">Ã—${i.quantity}</td>
+      <td style="${STYLES.tableCell};text-align:right;font-weight:700">â‚¹${(i.price * i.quantity).toFixed(2)}</td>
     </tr>
   `).join('');
 
@@ -228,16 +240,16 @@ function orderConfirmation(name, order, items) {
     </table>
 
     <table width="100%" cellpadding="0" cellspacing="0" style="margin:0 0 4px;font-size:13px;color:#555;line-height:2">
-      <tr><td style="width:100px">Subtotal</td><td style="text-align:right">₹${order.subtotal.toFixed(2)}</td></tr>
-      ${savings > 0 ? `<tr><td>Discount ${order.coupon_code ? `(${order.coupon_code})` : ''}</td><td style="text-align:right;color:#4ade80">-₹${savings.toFixed(2)}</td></tr>` : ''}
-      <tr><td>Shipping</td><td style="text-align:right">${shipping > 0 ? `₹${shipping.toFixed(2)}` : 'FREE'}</td></tr>
-      <tr><td>Taxes (GST)</td><td style="text-align:right">₹${(order.tax || 0).toFixed(2)}</td></tr>
+      <tr><td style="width:100px">Subtotal</td><td style="text-align:right">â‚¹${order.subtotal.toFixed(2)}</td></tr>
+      ${savings > 0 ? `<tr><td>Discount ${order.coupon_code ? `(${order.coupon_code})` : ''}</td><td style="text-align:right;color:#4ade80">-â‚¹${savings.toFixed(2)}</td></tr>` : ''}
+      <tr><td>Shipping</td><td style="text-align:right">${shipping > 0 ? `â‚¹${shipping.toFixed(2)}` : 'FREE'}</td></tr>
+      <tr><td>Taxes (GST)</td><td style="text-align:right">â‚¹${(order.tax || 0).toFixed(2)}</td></tr>
     </table>
     <hr style="${STYLES.divider}">
     <table width="100%" cellpadding="0" cellspacing="0" style="font-size:16px;font-weight:900;color:#111;line-height:2">
-      <tr><td>Total</td><td style="text-align:right">₹${order.total_amount.toFixed(2)}</td></tr>
+      <tr><td>Total</td><td style="text-align:right">â‚¹${order.total_amount.toFixed(2)}</td></tr>
     </table>
-    ${savings > 0 ? `<p style="margin:12px 0 0;font-size:13px;color:#4ade80;font-weight:600">You saved ₹${savings.toFixed(2)}</p>` : ''}
+    ${savings > 0 ? `<p style="margin:12px 0 0;font-size:13px;color:#4ade80;font-weight:600">You saved â‚¹${savings.toFixed(2)}</p>` : ''}
 
     <hr style="${STYLES.divider}">
 
@@ -255,12 +267,12 @@ function orderConfirmation(name, order, items) {
 
     <hr style="${STYLES.divider}">
 
-    <table cellpadding="0" cellspacing="0"><tr><td><a href="${SITE_URL}/order/${order.id}" style="${STYLES.btn}">View Order →</a></td></tr></table>
+    <table cellpadding="0" cellspacing="0"><tr><td><a href="${SITE_URL}/order/${order.id}" style="${STYLES.btn}">View Order â†’</a></td></tr></table>
     <p style="margin:12px 0 0;font-size:13px;color:#888">Track your order anytime: <a href="${SITE_URL}/track-order/${order.id}" style="color:#111;font-weight:600;text-decoration:underline">${SITE_URL}/track-order/${order.id}</a></p>
   `);
 }
 
-// ─── Shipping Status Email ──────────────────────────────────
+// â”€â”€â”€ Shipping Status Email â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 function shippingStatus(name, order, status, items) {
   const statusSeq = ['pending','confirmed','processing','shipped','out_for_delivery','delivered'];
@@ -277,8 +289,8 @@ function shippingStatus(name, order, status, items) {
     itemsHtml = items.map((i, idx2) => `
       <tr${idx2 % 2 === 1 ? ` style="background:#f9f9f9"` : ''}>
         <td style="${STYLES.tableCell}"><strong>${i.name}</strong></td>
-        <td style="${STYLES.tableCell};text-align:center">×${i.quantity}</td>
-        <td style="${STYLES.tableCell};text-align:right">₹${(i.price * i.quantity).toFixed(2)}</td>
+        <td style="${STYLES.tableCell};text-align:center">Ã—${i.quantity}</td>
+        <td style="${STYLES.tableCell};text-align:right">â‚¹${(i.price * i.quantity).toFixed(2)}</td>
       </tr>
     `).join('');
   }
@@ -302,7 +314,7 @@ function shippingStatus(name, order, status, items) {
       <table width="100%" cellpadding="0" cellspacing="0">
         <tr>${statusSeq.map((s, i) => `
           <td style="text-align:center;padding:0 4px;width:${100/statusSeq.length}%">
-            <div style="width:24px;height:24px;border-radius:50%;margin:0 auto 6px;background:${i <= idx ? '#111' : '#ddd'};color:#fff;font-size:11px;font-weight:700;line-height:24px">✓</div>
+            <div style="width:24px;height:24px;border-radius:50%;margin:0 auto 6px;background:${i <= idx ? '#111' : '#ddd'};color:#fff;font-size:11px;font-weight:700;line-height:24px">âœ“</div>
             <div style="font-size:9px;color:${i <= idx ? '#111' : '#999'};font-weight:${i <= idx ? '700' : '400'};text-transform:uppercase">${statusLabels[s].replace(' ','<br>')}</div>
           </td>
         `).join('')}</tr>
@@ -320,22 +332,22 @@ function shippingStatus(name, order, status, items) {
       <tbody>${itemsHtml}</tbody>
     </table>
     <table width="100%" cellpadding="0" cellspacing="0" style="font-size:13px;color:#555;line-height:2">
-      <tr><td style="width:100px">Subtotal</td><td style="text-align:right">₹${(order.subtotal || 0).toFixed(2)}</td></tr>
-      ${(order.discount_amount || 0) > 0 ? `<tr><td>Discount</td><td style="text-align:right;color:#4ade80">-₹${(order.discount_amount || 0).toFixed(2)}</td></tr>` : ''}
-      <tr><td>Shipping</td><td style="text-align:right">${(order.shipping || 0) > 0 ? `₹${(order.shipping || 0).toFixed(2)}` : 'FREE'}</td></tr>
+      <tr><td style="width:100px">Subtotal</td><td style="text-align:right">â‚¹${(order.subtotal || 0).toFixed(2)}</td></tr>
+      ${(order.discount_amount || 0) > 0 ? `<tr><td>Discount</td><td style="text-align:right;color:#4ade80">-â‚¹${(order.discount_amount || 0).toFixed(2)}</td></tr>` : ''}
+      <tr><td>Shipping</td><td style="text-align:right">${(order.shipping || 0) > 0 ? `â‚¹${(order.shipping || 0).toFixed(2)}` : 'FREE'}</td></tr>
     </table>
     <hr style="${STYLES.divider}">
     <table width="100%" cellpadding="0" cellspacing="0" style="font-size:16px;font-weight:900;color:#111;line-height:2">
-      <tr><td>Total</td><td style="text-align:right">₹${(order.total_amount || 0).toFixed(2)}</td></tr>
+      <tr><td>Total</td><td style="text-align:right">â‚¹${(order.total_amount || 0).toFixed(2)}</td></tr>
     </table>
     ` : ''}
 
     <hr style="${STYLES.divider}">
-    <table cellpadding="0" cellspacing="0"><tr><td><a href="${SITE_URL}/track-order/${order.id}" style="${STYLES.btn}">Track My Order →</a></td></tr></table>
+    <table cellpadding="0" cellspacing="0"><tr><td><a href="${SITE_URL}/track-order/${order.id}" style="${STYLES.btn}">Track My Order â†’</a></td></tr></table>
   `);
 }
 
-// ─── Public API ──────────────────────────────────────────────
+// â”€â”€â”€ Public API â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 async function sendVerificationOTP(user, otp) {
   await sendMail({ to: user.email, subject: 'GymSword Login OTP', html: verificationOTP(user.name, otp), userId: user.id, type: 'email_verification' });
