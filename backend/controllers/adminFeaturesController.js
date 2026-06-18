@@ -79,7 +79,7 @@ const deleteFAQ = async (req, res) => {
 const getReturnRequests = async (req, res) => {
   try {
     const { status, page = 1, limit = 50 } = req.query;
-    let query = supabase.from('return_requests').select('*, users(name, email), orders(order_number)', { count: 'exact' }).order('created_at', { ascending: false });
+    let query = supabase.from('return_requests').select('*', { count: 'exact' }).order('created_at', { ascending: false });
     if (status) query = query.eq('status', status);
     const offset = (parseInt(page) - 1) * parseInt(limit);
     const { data, error, count } = await query.range(offset, offset + parseInt(limit) - 1);

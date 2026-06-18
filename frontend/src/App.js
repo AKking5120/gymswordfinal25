@@ -73,6 +73,7 @@ import TermsAndConditions from "@/pages/TermsAndConditions";
 import GiftCards from "@/pages/GiftCards";
 import SEO from "@/components/SEO";
 import WelcomePopup from "@/components/WelcomePopup";
+import ChatBot from "@/components/ChatBot";
 
 import { ProtectedRoute } from "@/components/ProtectedRoute";
 import AccountWallet from "./pages/account/AccountWallet";
@@ -107,6 +108,7 @@ function App() {
               <SEO />
               <WelcomePopupGate />
               <Toaster position="top-center" theme="light" />
+              <ChatBot />
               <Routes>
                 <Route path="/" element={<Home />} />
                 <Route path="/shop" element={<Shop />} />

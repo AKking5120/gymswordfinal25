@@ -44,7 +44,7 @@ app.get('/api/health', (req, res) => {
   res.json({ success: true, message: 'Server is running', timestamp: new Date().toISOString() });
 });
 
-// Serve frontend build â€” SPA fallback for all non-API routes
+// Serve frontend build — SPA fallback for all non-API routes
 app.use(express.static(path.join(__dirname, 'public')));
 app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'index.html'));

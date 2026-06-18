@@ -32,4 +32,20 @@ const protect = async (req, res, next) => {
   }
 };
 
-module.exports = { protect };
+const protectOptional = async (req, res, next) => {
+  try {
+    const authHeader = req.headers.authorization;
+    if (!authHeader || !authHeader.startsWith('Bearer ')) return next();
+    const token = authHeader.split(' ')[1];
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const { data: user } = await supabase
+      .from('users')
+      .select('id, name, email, role, wallet_coins, public_id, email_verified, is_disabled')
+      .eq('id', decoded.id)
+      .single();
+    if (user && !user.is_disabled) req.user = user;
+  } catch {}
+  next();
+};
+
+module.exports = { protect, protectOptional };

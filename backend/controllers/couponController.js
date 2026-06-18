@@ -63,7 +63,7 @@ const useCoupon = async (req, res) => {
 // GET /api/coupons (admin)
 const getAllCoupons = async (req, res) => {
   try {
-    const { data, error } = await supabase.from('coupons').select('*').order('created_at', { ascending: false });
+    const { data, error } = await supabase.from('coupons').select('*').order('id', { ascending: false });
     if (error) return sendError(res, error.message);
     return sendSuccess(res, { data: data || [] });
   } catch (err) {

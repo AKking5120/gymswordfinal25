@@ -7,7 +7,7 @@ try {
   const smtpUser = process.env.SMTP_USER || '';
   const smtpPass = process.env.SMTP_PASS || '';
 
-  // Try port 587 (STARTTLS) first â€” works on most hosts including Render
+  // Try port 587 (STARTTLS) first — works on most hosts including Render
   transporter = nodemailer.createTransport({
     host: smtpHost,
     port: 587,
@@ -72,7 +72,7 @@ async function sendMail({ to, subject, html, userId, type, attachments }) {
   }
 
   await logEmail(userId, type, to, subject, 'failed');
-  console.log(`[OTP LOG] Email would go to ${to} â€” check above for OTP in logs`);
+  console.log(`[OTP LOG] Email would go to ${to} — check above for OTP in logs`);
 }
 
 // â”€â”€â”€ Shared Styles â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€

@@ -192,34 +192,48 @@ export default function Home() {
         <div className="grain-overlay absolute inset-0" />
         <div className="relative max-w-[1400px] mx-auto px-6 md:px-12 py-24 md:py-40 grid lg:grid-cols-12 gap-12">
           <div className="lg:col-span-4">
-            <div className="text-overline text-white/60 mb-3">Manifesto</div>
+            <div className="text-overline text-white/60 mb-3">About GymSword</div>
             <h2 className="font-display uppercase font-black text-4xl sm:text-5xl tracking-tight">
-              We forge<br />the unbroken.
+              Built for<br />modern warriors.
             </h2>
           </div>
-          <div className="lg:col-span-7 lg:col-start-6 space-y-6 text-white/80 font-light leading-relaxed text-lg">
-            <p>
-              GymSword is not just apparel. It is armor for the relentless. Every seam, every fiber,
-              every cut is engineered for athletes who demand more from themselves — and from the gear
-              they trust to perform.
-            </p>
-            <p>
-              We source from heritage Italian mills, partner with elite athletes, and obsess over the
-              one-degree details that separate good from world-class. This is athleisure, refined to
-              the standard of luxury.
-            </p>
-            <div className="pt-6 grid grid-cols-3 gap-8 text-center">
+          <div className="lg:col-span-7 lg:col-start-6 space-y-10 text-white/80 font-light leading-relaxed text-lg">
+            <div>
+              <h3 className="text-white font-display uppercase font-bold text-sm tracking-[0.15em] mb-3">Our Mission</h3>
+              <p>
+                GymSword was born from a singular vision — to create premium fitness apparel that bridges the gap
+                between high-performance athletics and luxury fashion. We believe that what you wear during training
+                should be crafted with the same precision and care as the finest fashion.
+              </p>
+            </div>
+            <div>
+              <h3 className="text-white font-display uppercase font-bold text-sm tracking-[0.15em] mb-3">The Brand</h3>
+              <p>
+                Every GymSword piece is engineered for athletes who demand more. Our fabrics are sourced from the
+                world's finest mills, our cuts are refined through hundreds of iterations, and our quality standards
+                are uncompromising. We don't follow trends — we set them.
+              </p>
+            </div>
+            <div>
+              <h3 className="text-white font-display uppercase font-bold text-sm tracking-[0.15em] mb-3">Quality First</h3>
+              <p>
+                From moisture-wicking performance fabrics to reinforced stitching, every detail is considered.
+                Our collections are designed to transition seamlessly from the gym to the street, because style
+                should never be sacrificed for performance.
+              </p>
+            </div>
+            <div className="pt-4 grid grid-cols-3 gap-8 text-center">
               <div>
-                <div className="font-display text-4xl">100K+</div>
-                <div className="text-overline text-white/50 mt-2">Athletes</div>
+                <div className="font-display text-4xl font-black">10K+</div>
+                <div className="text-overline text-white/50 mt-2">Athletes Trust Us</div>
               </div>
               <div>
-                <div className="font-display text-4xl">42</div>
-                <div className="text-overline text-white/50 mt-2">Countries</div>
+                <div className="font-display text-4xl font-black">500+</div>
+                <div className="text-overline text-white/50 mt-2">Premium Products</div>
               </div>
               <div>
-                <div className="font-display text-4xl">4.9</div>
-                <div className="text-overline text-white/50 mt-2">Rating</div>
+                <div className="font-display text-4xl font-black">4.8★</div>
+                <div className="text-overline text-white/50 mt-2">Customer Rating</div>
               </div>
             </div>
           </div>

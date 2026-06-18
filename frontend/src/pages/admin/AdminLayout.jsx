@@ -4,7 +4,7 @@ import {
   LayoutDashboard, TrendingUp, Package, Box, Tag, Image, Zap,
   ShoppingCart, RotateCcw, Ticket, Users, UserPlus, UserCheck, Star,
   BookOpen, Mail, Users2, FileText, Download, Shield, HelpCircle,
-  BarChart3, Settings as Cog, LogOut, ArrowUp, ChevronDown, ChevronRight,
+  BarChart3, Settings as Cog, LogOut, ChevronDown, ChevronRight,
   PanelLeftClose, PanelLeft, BookText,
 } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
@@ -87,7 +87,6 @@ export default function AdminLayout() {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
   const { pathname } = useLocation();
-  const [showTop, setShowTop] = useState(false);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(() =>
     localStorage.getItem(LS_COLLAPSED) === "true"
   );
@@ -243,16 +242,6 @@ export default function AdminLayout() {
       <main className="flex-1 p-8 md:p-12 overflow-x-auto relative min-w-0">
         <Outlet />
       </main>
-
-      {showTop && (
-        <button
-          onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
-          className="fixed bottom-8 right-8 z-50 w-12 h-12 rounded-full bg-white text-black flex items-center justify-center shadow-lg hover:bg-white/90 transition"
-          title="Back to top"
-        >
-          <ArrowUp size={20} />
-        </button>
-      )}
     </div>
   );
 }
