@@ -15,6 +15,7 @@ const settingsRoutes = require('./routes/settingsRoutes');
 const contactRoutes    = require('./routes/contactRoutes');
 const paymentRoutes    = require('./routes/paymentRoutes');
 const leadRoutes       = require('./routes/leadRoutes');
+const chatRoutes       = require('./routes/chatRoutes');
 
 const app = express();
 
@@ -36,10 +37,17 @@ app.use('/api/settings', settingsRoutes);
 app.use('/api/contact',    contactRoutes);
 app.use('/api/payment',    paymentRoutes);
 app.use('/api/leads',      leadRoutes);
+app.use('/api/chat',       chatRoutes);
 
 // Health check
 app.get('/api/health', (req, res) => {
   res.json({ success: true, message: 'Server is running', timestamp: new Date().toISOString() });
+});
+
+// Serve frontend build â€” SPA fallback for all non-API routes
+app.use(express.static(path.join(__dirname, 'public')));
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
 // 404 handler
