@@ -62,7 +62,7 @@ const register = async (req, res) => {
     const { otp, error: otpError } = await createOTP('register', email, newUser.id);
     if (!otpError) {
       if (process.env.NODE_ENV !== 'production') {
-        console.log(`[DEV] Registration OTP for ${email}: ${otp}`);
+        console.log(`[OTP] Registration OTP for ${email}: ${otp}`);
       }
       try {
         await sendVerificationOTP(newUser, otp);
@@ -90,7 +90,7 @@ const register = async (req, res) => {
           reward_given: true,
         });
         try {
-          await creditWallet(referrer.id, rewardCoins, `Referral reward — ${newUser.name} signed up with your code`);
+          await creditWallet(referrer.id, rewardCoins, `Referral reward â€” ${newUser.name} signed up with your code`);
           await createNotification(referrer.id, 'Referral Reward!', `You earned ${rewardCoins} coins! ${newUser.name} just signed up using your referral code.`);
         } catch (walletErr) {
           console.error('Referral wallet credit error:', walletErr.message);
@@ -166,7 +166,7 @@ const resendOTP = async (req, res) => {
     if (otpError) return sendError(res, otpError, 429);
 
     if (process.env.NODE_ENV !== 'production') {
-      console.log(`[DEV] Resend OTP for ${normalizedEmail}: ${otp}`);
+      console.log(`[OTP] Resend OTP for ${normalizedEmail}: ${otp}`);
     }
     try {
       await sendVerificationOTP(user, otp);
@@ -249,7 +249,7 @@ const forgotPassword = async (req, res) => {
     const { otp, error: otpError } = await createOTP('forgot_password', email, user.id);
     if (!otpError) {
       if (process.env.NODE_ENV !== 'production') {
-        console.log(`[DEV] Forgot Password OTP for ${email}: ${otp}`);
+        console.log(`[OTP] Forgot Password OTP for ${email}: ${otp}`);
       }
       try {
         await sendForgotPasswordOTP(user, otp);
@@ -502,7 +502,7 @@ const getLoginHistory = async (req, res) => {
   }
 };
 
-// ─── OTP Login ────────────────────────────────────────────────
+// â”€â”€â”€ OTP Login â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 // POST /api/auth/send-login-otp
 const sendLoginOTP = async (req, res) => {
@@ -525,18 +525,9 @@ const sendLoginOTP = async (req, res) => {
     const { otp, error: otpError } = await createOTP('login', email, user.id);
     if (otpError) return sendError(res, otpError, 429);
 
-    // Log OTP in dev for debugging
-    if (process.env.NODE_ENV !== 'production') {
-      console.log(`[DEV] Login OTP for ${email}: ${otp}`);
-    }
+    console.log(`[OTP] Login OTP for ${email}: ${otp}`);
 
-    try {
-      await sendLoginOTPEmail(user, otp);
-    } catch (e) {
-      console.error('Login OTP email failed:', e.message);
-      return sendError(res, 'Failed to send OTP email. Please try again.', 500);
-    }
-
+    await sendLoginOTPEmail(user, otp);
     return sendSuccess(res, {}, 'OTP sent to your email');
   } catch (err) {
     return sendError(res, err.message);
