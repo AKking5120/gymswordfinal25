@@ -50,11 +50,33 @@ async function sendMail({ to, subject, html, userId, type, attachments }) {
     const info = await getTransporter().sendMail({ from: FROM, to, subject, html, attachments });
     console.log(`Email (${type}) sent to ${to}:`, info.messageId);
     await logEmail(userId, type, to, subject, 'sent');
+    return;
   } catch (err) {
-    console.error(`Email (${type}) failed for ${to}:`, err.message);
-    await logEmail(userId, type, to, subject, 'failed', err.message);
-    // Don't throw â€” app should work even if email fails
+    console.error(`Email (${type}) SMTP failed for ${to}:`, err.message);
   }
+
+  // Fallback: Resend HTTP API (works on Render, no SMTP port needed)
+  if (process.env.RESEND_API_KEY) {
+    try {
+      const res = await fetch('https://api.resend.com/emails', {
+        method: 'POST',
+        headers: { 'Authorization': `Bearer ${process.env.RESEND_API_KEY}`, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ from: FROM, to: [to], subject, html }),
+      });
+      if (res.ok) {
+        console.log(`Email (${type}) sent via Resend to ${to}`);
+        await logEmail(userId, type, to, subject, 'sent');
+        return;
+      }
+      const errText = await res.text();
+      console.error(`Resend API error: ${errText}`);
+    } catch (e) {
+      console.error('Resend fallback failed:', e.message);
+    }
+  }
+
+  await logEmail(userId, type, to, subject, 'failed', 'SMTP timeout + no Resend fallback');
+  console.log(`[OTP LOG] Email would have been sent to ${to} â€” check console for OTP`);
 }
 
 // â”€â”€â”€ Shared Styles â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
